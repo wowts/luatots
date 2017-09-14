@@ -1,0 +1,25 @@
+{
+  "name": "luatots",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "antlr4ts": "antlr4ts -visitor Lua.g",
+    "debug": "tsc -p . && node dist/index.js",
+    "watch": "tsc -w",
+    "test": "ava dist/tests",
+    "test:watch": "ava --watch dist/tests",
+    "test:debug": "node node_modules/ava/profile.js dist/tests"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "antlr4ts": "0.4.1-alpha.0"
+  },
+  "devDependencies": {
+    "antlr4ts-cli": "0.4.0-alpha.4",
+    "typescript": "2.3.4",
+    "@types/node": "^8.0.0",
+    "ava": "^0.22.0"
+  }
+}

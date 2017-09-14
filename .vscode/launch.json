@@ -1,0 +1,33 @@
+{
+    // Utilisez IntelliSense pour découvrir les attributs de débogage Node.js possibles.
+    // Pointez pour afficher la description des attributs existants.
+    // Pour plus d'informations, visitez : https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug tests",
+            "program": "${workspaceRoot}/node_modules/ava/profile.js",
+            "args": ["${workspaceRoot}/dist/tests/tsvisitor.spec.js"],
+            "outFiles": [
+                "${workspaceRoot}/dist/**/*.js"
+            ],
+            "protocol": "inspector"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug",
+            "runtimeExecutable": "npm",
+            "windows": {
+                "runtimeExecutable": "npm.cmd"
+            },
+            "runtimeArgs": [
+                "run-script",
+                "debug"
+            ],
+            "outFiles": [ "${workspaceRoot}/dist/**/*.js" ]
+        }
+    ]
+}
