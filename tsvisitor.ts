@@ -1,5 +1,5 @@
 import { LuaVisitor } from './LuaVisitor';
-import { ChunkContext, BlockContext, NumberContext, LuaParser, StatContext, IfContext, AssignmentContext, Varlist1Context, Explist1Context, LocalvardeclContext, NamelistContext, VarContext, ExpContext, OperandContext, BinopContext, LocalfunctiondeclContext, FuncbodyContext, Parlist1Context, ForContext, UnopContext, UnopexpContext, FuncnameContext, ArgsContext, NameAndArgsContext, VarSuffixContext, StringContext, LaststatContext, FunctiondeclContext } from './LuaParser';
+import { ChunkContext, BlockContext, NumberContext, LuaParser, StatContext, IfContext, AssignmentContext, Varlist1Context, Explist1Context, LocalvardeclContext, NamelistContext, VarContext, ExpContext, OperandContext, BinopContext, LocalfunctiondeclContext, FuncbodyContext, Parlist1Context, ForContext, UnopContext, UnopexpContext, FuncnameContext, ArgsContext, NameAndArgsContext, VarSuffixContext, StringContext, LaststatContext, FunctiondeclContext, TableconstructorContext, FieldlistContext, FieldContext } from './LuaParser';
 
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode';
 import { ParseTree } from 'antlr4ts/tree/ParseTree';
@@ -129,6 +129,37 @@ export class TsVisitor implements LuaVisitor<void> {
         }
     }
 
+    visitTableconstructor(ctx: TableconstructorContext) {
+        this.result += '{ ';
+        ctx.getChild(0, FieldlistContext).accept(this);
+        this.result += ' }';
+    }
+
+    visitFieldlist(ctx: FieldlistContext) {
+        for (let i = 0; ; i++) {
+            const child = ctx.tryGetChild(i, FieldContext);
+            if (!child) break;
+            if (i > 0) this.result += ', ';
+
+            let key: string;
+            if (child.NAME()) {
+                this.result += child.NAME().text;
+                this.result += ": ";
+                child.getChild(0, ExpContext).accept(this);
+            }
+            else if (child.childCount == 1) {
+                this.result += (i + 1).toString() + ": ";
+                child.getChild(0, ExpContext).accept(this);
+            }
+            else {
+                this.result += '[';
+                child.getChild(0, ExpContext).accept(this);
+                this.result += "]: ";
+                child.getChild(1, ExpContext).accept(this);
+            }
+        }
+    }
+    
     visitLaststat(ctx: LaststatContext) {
         this.writeTabs();
         const explist1 = ctx.tryGetChild(0, Explist1Context);

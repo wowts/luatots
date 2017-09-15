@@ -114,6 +114,36 @@ class TsVisitor {
             }
         }
     }
+    visitTableconstructor(ctx) {
+        this.result += '{ ';
+        ctx.getChild(0, LuaParser_1.FieldlistContext).accept(this);
+        this.result += ' }';
+    }
+    visitFieldlist(ctx) {
+        for (let i = 0;; i++) {
+            const child = ctx.tryGetChild(i, LuaParser_1.FieldContext);
+            if (!child)
+                break;
+            if (i > 0)
+                this.result += ', ';
+            let key;
+            if (child.NAME()) {
+                this.result += child.NAME().text;
+                this.result += ": ";
+                child.getChild(0, LuaParser_1.ExpContext).accept(this);
+            }
+            else if (child.childCount == 1) {
+                this.result += (i + 1).toString() + ": ";
+                child.getChild(0, LuaParser_1.ExpContext).accept(this);
+            }
+            else {
+                this.result += '[';
+                child.getChild(0, LuaParser_1.ExpContext).accept(this);
+                this.result += "]: ";
+                child.getChild(1, LuaParser_1.ExpContext).accept(this);
+            }
+        }
+    }
     visitLaststat(ctx) {
         this.writeTabs();
         const explist1 = ctx.tryGetChild(0, LuaParser_1.Explist1Context);

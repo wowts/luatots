@@ -91,3 +91,14 @@ function Third() {
 }
 `);
 });
+
+test(t => {
+    t.is(testTransform(`local a = { 'a', 'b', 'c' }`), `let a = { 1: 'a', 2: 'b', 3: 'c' }
+`)
+});
+
+
+test(t => {
+    t.is(testTransform(`local a = { TEST = 'a', ["a"] = 'b' }`), `let a = { TEST: 'a', ["a"]: 'b' }
+`)
+});

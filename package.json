@@ -2,7 +2,7 @@
   "name": "luatots",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "antlr4ts": "antlr4ts -visitor Lua.g",
     "prepublish": "tsc -p .",
