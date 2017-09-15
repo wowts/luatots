@@ -24,13 +24,15 @@ test(t => {
 
 test(t => {
     t.is(testTransform(`local function test(a, b, c)
-end`), `const test = function(a, b, c) {}
+end`), `const test = function(a, b, c) {
+}
 `);
 });
 
 test(t => {
     t.is(testTransform(`for k = #test, 1, -1 do
-end`), `for (let k = luat_length(test); k >= 1; k += -1) {}
+end`), `for (let k = table.getn(test); k >= 1; k += -1) {
+}
 `);
 });
 
@@ -41,5 +43,51 @@ test(t => {
 
 test(t => {
     t.is(testTransform(`Ovale.refreshNeeded[self_playerGUID] = true`), `Ovale.refreshNeeded[self_playerGUID] = true;
+`);
+});
+
+test(t => {
+    t.is(testTransform(`if comboEvent.reason == "Anticipation" then
+    state:RemoveAuraOnGUID(self_playerGUID, ANTICIPATION, "HELPFUL", true, comboEvent.atTime)
+    break
+end`), `if (comboEvent.reason == "Anticipation") {
+    state.RemoveAuraOnGUID(self_playerGUID, ANTICIPATION, "HELPFUL", true, comboEvent.atTime);
+    break;
+}
+`);
+});
+
+test(t => {
+    t.is(testTransform(`function Class:First()
+end
+
+function Class:Second()
+end`), `class Class {
+    First() {
+    }
+    Second() {
+    }
+}
+`);
+});
+
+
+test(t => {
+    t.is(testTransform(`function Class:First()
+end
+
+function Class:Second()
+end
+
+function Third()
+end
+`), `class Class {
+    First() {
+    }
+    Second() {
+    }
+}
+function Third() {
+}
 `);
 });

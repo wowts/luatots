@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "antlr4ts": "antlr4ts -visitor Lua.g",
-    "debug": "tsc -p . && node dist/index.js",
-    "watch": "tsc -w",
+    "prepublish": "tsc -p .",
+    "prepublish:debug": "tsc -p . && node dist/index.js",
+    "prepublish:watch": "tsc -w",
     "test": "ava dist/tests",
     "test:watch": "ava --watch dist/tests",
     "test:debug": "node node_modules/ava/profile.js dist/tests"
