@@ -22,7 +22,7 @@ chunk : (stat (';')?)* (laststat (';')?)?;
 
 block : chunk;
 
-stat :  assignment | 
+stat : assignment | 
 	functioncall | 
 	doblock | 
 	while | 
@@ -71,9 +71,9 @@ explist1 : (exp ',')* exp;
 
 exp : operand (binop exp)* ;
 
-unopexp: unop exp;
+unopexp: unop operand;
 
-operand: 'nil' | 'false' | 'true' | number | string | '...' | function | prefixexp | tableconstructor | unopexp;
+operand: 'nil' | 'false' | 'true' | number | string | SPREAD | function | prefixexp | tableconstructor | unopexp;
 
 var: (NAME | '(' exp ')' varSuffix) varSuffix*;
 
@@ -101,7 +101,9 @@ function : 'function' funcbody;
 
 funcbody : '(' (parlist1)? ')' block 'end';
 
-parlist1 : namelist (',' '...')? | '...';
+parlist1 : namelist (',' SPREAD)? | SPREAD;
+
+SPREAD: '...';
 
 tableconstructor : '{' (fieldlist)? '}';
 

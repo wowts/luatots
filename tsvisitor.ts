@@ -1,5 +1,5 @@
 import { LuaVisitor } from './LuaVisitor';
-import { ChunkContext, BlockContext, NumberContext, LuaParser, StatContext, IfContext, AssignmentContext, Varlist1Context, Explist1Context, LocalvardeclContext, NamelistContext, VarContext, ExpContext, OperandContext, BinopContext, LocalfunctiondeclContext, FuncbodyContext, Parlist1Context, ForContext, UnopContext, UnopexpContext, FuncnameContext, ArgsContext, NameAndArgsContext, VarSuffixContext, StringContext, LaststatContext, FunctiondeclContext, TableconstructorContext, FieldlistContext, FieldContext } from './LuaParser';
+import { ChunkContext, BlockContext, NumberContext, LuaParser, StatContext, IfContext, AssignmentContext, Varlist1Context, Explist1Context, LocalvardeclContext, NamelistContext, VarContext, ExpContext, OperandContext, BinopContext, LocalfunctiondeclContext, FuncbodyContext, Parlist1Context, ForContext, UnopContext, UnopexpContext, FuncnameContext, ArgsContext, NameAndArgsContext, VarSuffixContext, StringContext, LaststatContext, FunctiondeclContext, TableconstructorContext, FieldlistContext, FieldContext, ForinContext, ElseifContext, ElseContext, FunctionContext, VarOrExpContext, PrefixexpContext, FunctioncallContext, DoblockContext, WhileContext } from './LuaParser';
 
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode';
 import { ParseTree } from 'antlr4ts/tree/ParseTree';
@@ -12,11 +12,18 @@ interface Block {
     currentClass?: string;
 }
 
+export interface CompilerError {
+    position: number;
+    message: string;
+}
+
 export class TsVisitor implements LuaVisitor<void> {
     public result: string = "";
     private tabs = 0;
     private blocks: Block[] = [];
     private currentBlock: Block = {};
+    private nameMapping: { [key:string]: string} = {};
+    public errors: CompilerError[] = [];
 
     visitBlock(ctx: BlockContext): void {
        this.result += "{";
@@ -34,7 +41,9 @@ export class TsVisitor implements LuaVisitor<void> {
 
     visitStat(ctx: StatContext):void{
         this.writeTabs();
-        this.visitChildren(ctx);
+        for (let i = 0; i < ctx.childCount; i++) {
+            ctx.getChild(i).accept(this);
+        }
     }
 
     visitChunk(ctx: ChunkContext):void {
@@ -71,14 +80,40 @@ export class TsVisitor implements LuaVisitor<void> {
         if (ctx.INT()) {
             this.result += ctx.INT().symbol.text;
         }
+        else if (ctx.FLOAT()){
+            this.result += ctx.FLOAT().symbol.text;
+        }
     }
 
     visitIf(ctx: IfContext): void {
         this.result += "if (";
-        console.log(ctx.getChild(0).text);
         ctx.getChild(1).accept(this);
         this.result += ") ";
         ctx.getChild(3).accept(this);
+        for (let i = 0; ; i++) {
+            const elseif = ctx.tryGetChild(i, ElseifContext);
+            if (elseif) {
+                elseif.accept(this);
+            }
+            else break;
+        }
+
+        const elseContext = ctx.tryGetChild(0, ElseContext);
+        if (elseContext) {
+            elseContext.accept(this);
+        }
+    }
+
+    visitElseif(ctx: ElseifContext): void {
+        this.result += ' else if (';
+        ctx.getChild(0, ExpContext).accept(this);
+        this.result += ') ';
+        ctx.getChild(0, BlockContext).accept(this);
+    }
+
+    visitElse(ctx: ElseContext): void{
+        this.result += ' else ';
+        ctx.getChild(0, BlockContext).accept(this);
     }
 
     visitAssignment(ctx: AssignmentContext): void {
@@ -92,46 +127,112 @@ export class TsVisitor implements LuaVisitor<void> {
         }
         this.result += " = ";
         const exps = ctx.getChild<Explist1Context>(0, Explist1Context);
-        if (exps.childCount > 1 || exps.childCount == 0) {
-            throw Error("Unnsport exp list > 1");
-        }
-        exps.getChild<ExpContext>(0, ExpContext).accept(this);
+        exps.accept(this);
     }
 
     visitLocalvardecl(ctx: LocalvardeclContext):void{
         const namelist = ctx.getChild<NamelistContext>(0, NamelistContext);
+        const explist1 = ctx.tryGetChild(0, Explist1Context);
         this.result += "let ";
         if (namelist.childCount>  1){
             this.result += "[";
+        }
+        const needMapping = explist1 && namelist.text == explist1.text && namelist.childCount == 1;
+        if (needMapping) {
+            this.result += "_";
         }
         namelist.accept(this);
         if (namelist.childCount>  1){
             this.result += "]";
         }
 
-        const explist1 = ctx.tryGetChild(0, Explist1Context);
         if (explist1) {
             this.result += " = ";
             explist1.accept(this);
         }
+
+        if (needMapping) this.nameMapping[namelist.text] = "_" + namelist.text;        
+    }
+
+    visitExp(ctx: ExpContext) {
+        ctx.getChild(0, OperandContext).accept(this);
+        for (let i = 0; ; i++) {
+            const binop = ctx.tryGetChild(i, BinopContext);
+            if (!binop) break;
+            const exp = ctx.tryGetChild(i, ExpContext);
+            binop.accept(this);
+            exp.accept(this);            
+        }
+    }
+
+    visitPrefixexp(ctx: PrefixexpContext) {
+        for (let i = 0; i < ctx.childCount; i++) {
+            ctx.getChild(i).accept(this);
+        }
+    }
+
+    visitVarOrExp(ctx: VarOrExpContext) {
+        const v = ctx.tryGetChild(0, VarContext);
+        if (v) {
+            v.accept(this);
+        }
+        else {
+            this.result += "(";
+            ctx.getChild(0, ExpContext).accept(this);
+            this.result += ")";
+        }
+    }
+
+    visitDoblock(ctx: DoblockContext) {
+        ctx.getChild(0, BlockContext).accept(this);
+    }
+
+    visitWhile(ctx: WhileContext) {
+        this.result += "while (";
+        ctx.getChild(0, ExpContext).accept(this);
+        this.result += ") ";
+        ctx.getChild(0, BlockContext).accept(this);
+    }
+
+    visitFunctioncall(ctx: FunctioncallContext) {
+        for (let i = 0; i < ctx.childCount; i++) {
+            ctx.getChild(i).accept(this);
+        }
     }
 
     visitExplist1(ctx: Explist1Context) {
+        let needList = ctx.parent instanceof ArgsContext;
+        if (ctx.parent instanceof AssignmentContext) {
+            const assignement = <AssignmentContext>ctx.parent;
+            const vars = assignement.getChild(0, Varlist1Context);
+            if (vars.childCount > 1) needList = false;
+        }
+        const firstChild = ctx.tryGetChild(0, ExpContext);
+        let isList = ctx.childCount > 1;
+        if (firstChild) {
+            const operand = firstChild.tryGetChild(0, OperandContext);
+            if (operand && operand.SPREAD()) isList = true;
+        }
+        if (isList) {
+            if (!needList) this.result += '[';
+        }
+
         for (let i = 0; ; i++) {
             const exp = ctx.tryGetChild(i, ExpContext);
-            if (exp) {
-                if (i > 0) this.result += ", ";
-                exp.accept(this);    
-            }
-            else {
-                break;
-            }
+            if (!exp) break;
+            if (i > 0) this.result += ", ";
+            exp.accept(this);    
         }
+        if (isList) {
+            if (!needList) this.result += ']';
+        }
+        
     }
 
     visitTableconstructor(ctx: TableconstructorContext) {
         this.result += '{ ';
-        ctx.getChild(0, FieldlistContext).accept(this);
+        const table = ctx.tryGetChild(0, FieldlistContext);
+        table && table.accept(this);
         this.result += ' }';
     }
 
@@ -143,7 +244,8 @@ export class TsVisitor implements LuaVisitor<void> {
 
             let key: string;
             if (child.NAME()) {
-                this.result += child.NAME().text;
+                const name = child.NAME().text;
+                this.result += name;
                 this.result += ": ";
                 child.getChild(0, ExpContext).accept(this);
             }
@@ -158,6 +260,16 @@ export class TsVisitor implements LuaVisitor<void> {
                 child.getChild(1, ExpContext).accept(this);
             }
         }
+    }
+
+    visitForin(ctx: ForinContext) {
+        this.result += 'for (const [';
+        const nameList = ctx.getChild(0, NamelistContext);
+        nameList.accept(this);
+        this.result += '] of ';
+        ctx.getChild(0, Explist1Context).accept(this);
+        this.result += ') ';
+        ctx.getChild(0, BlockContext).accept(this);
     }
     
     visitLaststat(ctx: LaststatContext) {
@@ -174,12 +286,33 @@ export class TsVisitor implements LuaVisitor<void> {
     }
 
     visitBinop(ctx: BinopContext) {
-        this.result += ` ${ctx.text} `;
+        let operator = ctx.text;
+        switch (operator) {
+            case "~=":
+                this.result += " != ";
+                break;
+            case "and":
+                this.result += " && ";
+                break;
+            case "or":
+                this.result += " || ";
+                break;
+            case "..":
+                this.result += " + ";
+                break;
+            default:
+                this.result += ` ${operator} `;
+        }
     }
 
     visitLocalfunctiondecl(ctx: LocalfunctiondeclContext) {
         this.result += `const ${ctx.NAME().text} = function`;
         ctx.getChild<FuncbodyContext>(0, FuncbodyContext).accept(this);
+    }
+
+    visitFunction(ctx: FunctionContext) {
+        this.result +=  "function ";
+        ctx.getChild(0, FuncbodyContext).accept(this);
     }
 
     visitFunctiondecl(ctx: FunctiondeclContext) {
@@ -207,9 +340,24 @@ export class TsVisitor implements LuaVisitor<void> {
         this.result += ') ';
         ctx.getChild(0, BlockContext).accept(this);
     }
+    
+    visitVarlist1(ctx: Varlist1Context):void {
+        for (let i = 0;; i++) {
+            const vars = ctx.tryGetChild(i, VarContext);
+            if (!vars) break;
+            if (i > 0) this.result += ", ";
+            vars.accept(this);
+        }
+    }
 
     visitParlist1(ctx: Parlist1Context) {
-        ctx.getChild<NamelistContext>(0, NamelistContext).accept(this);
+        const nameList = ctx.tryGetChild<NamelistContext>(0, NamelistContext);
+        nameList && nameList.accept(this);
+        const spread = ctx.SPREAD();
+        if (spread) {
+            if (nameList) this.result += ", ";
+            this.result += "...__args";
+        }
     }
 
     visitFuncname(ctx: FuncnameContext) {
@@ -224,7 +372,9 @@ export class TsVisitor implements LuaVisitor<void> {
         const names = ctx.NAME();
         for (let i = 0; i< names.length; i++){
             if (i != 0) this.result += ", ";
-            this.result += names[i].text;
+            const name = names[i].text;
+            if (this.nameMapping[name]) this.result += "_";
+            this.result += name;
         }
     }
 
@@ -256,15 +406,25 @@ export class TsVisitor implements LuaVisitor<void> {
     visitUnopexp(ctx: UnopexpContext) {
         const operator = ctx.getChild<UnopContext>(0, UnopContext);
         switch (operator.text) {
-            case "#":
-                this.result += "table.getn(";
-                ctx.getChild<ExpContext>(0, ExpContext).accept(this);
-                this.result += ")";
+            case 'not':
+                this.result += '!';
+                ctx.getChild(0, OperandContext).accept(this);
                 break;
+
+            case '-':
+                this.result += '-';
+                ctx.getChild(0, OperandContext).accept(this);
+                break;
+
+            case '#':
+                this.result += "lualength(";
+                ctx.getChild(0, OperandContext).accept(this);
+                this.result += ")";
+                break;    
 
             default:
                 this.result += operator.text;
-                ctx.getChild<ExpContext>(0, ExpContext).accept(this);
+                ctx.getChild(0, OperandContext).accept(this);
                 break;
         }
     }
@@ -312,8 +472,14 @@ export class TsVisitor implements LuaVisitor<void> {
         if (ctx.text == 'true') {
             this.result += "true";
         }
+        else if (ctx.text == 'false') {
+            this.result += "false";
+        }
         else if (ctx.text == "nil") {
             this.result += "undefined";
+        }
+        else if (ctx.SPREAD()) {
+            this.result += "...__args";
         }
         else {
             ctx.getChild(0).accept(this);
@@ -341,7 +507,14 @@ export class TsVisitor implements LuaVisitor<void> {
             this.result += ")";
         }
         else {
-            this.result += ctx.NAME().text;
+            const name = ctx.NAME().text;
+            if (name === "self"){
+                this.result += "this";
+            }
+            else {
+                if (this.nameMapping[name]) this.result += '_';
+                this.result += name;
+            }
         }
         for (let i = 0;; i++) {
             const suffix = ctx.tryGetChild(i, VarSuffixContext);
@@ -375,6 +548,7 @@ export class TsVisitor implements LuaVisitor<void> {
      * @return The result of visiting the children of the node.
      */
     visitChildren(node: RuleNode):void {
+        this.errors.push({ position: node.sourceInterval.a, message: `${(<any>node).__proto__.constructor.name} ${node.text} can't be parsed` });
         for (let i = 0; i < node.childCount; i++) {
             node.getChild(i).accept(this);
         }

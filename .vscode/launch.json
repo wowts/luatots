@@ -19,14 +19,7 @@
             "type": "node",
             "request": "launch",
             "name": "Debug",
-            "runtimeExecutable": "npm",
-            "windows": {
-                "runtimeExecutable": "npm.cmd"
-            },
-            "runtimeArgs": [
-                "run-script",
-                "debug"
-            ],
+            "program": "${workspaceRoot}/dist/index.js",
             "outFiles": [ "${workspaceRoot}/dist/**/*.js" ]
         }
     ]

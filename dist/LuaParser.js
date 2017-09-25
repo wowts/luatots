@@ -41,7 +41,7 @@ class LuaParser extends Parser_1.Parser {
                 this.state = 88;
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
-                while ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << LuaParser.T__1) | (1 << LuaParser.T__3) | (1 << LuaParser.T__4) | (1 << LuaParser.T__8) | (1 << LuaParser.T__12) | (1 << LuaParser.T__13) | (1 << LuaParser.T__14) | (1 << LuaParser.T__24))) !== 0) || _la === LuaParser.NAME) {
+                while ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << LuaParser.T__1) | (1 << LuaParser.T__3) | (1 << LuaParser.T__4) | (1 << LuaParser.T__8) | (1 << LuaParser.T__12) | (1 << LuaParser.T__13) | (1 << LuaParser.T__14) | (1 << LuaParser.T__23))) !== 0) || _la === LuaParser.NAME) {
                     {
                         {
                             this.state = 82;
@@ -664,7 +664,7 @@ class LuaParser extends Parser_1.Parser {
                         this.state = 193;
                         this._errHandler.sync(this);
                         _la = this._input.LA(1);
-                        if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << LuaParser.T__12) | (1 << LuaParser.T__20) | (1 << LuaParser.T__21) | (1 << LuaParser.T__22) | (1 << LuaParser.T__23) | (1 << LuaParser.T__24) | (1 << LuaParser.T__28))) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & ((1 << (LuaParser.T__31 - 32)) | (1 << (LuaParser.T__45 - 32)) | (1 << (LuaParser.T__46 - 32)) | (1 << (LuaParser.NAME - 32)) | (1 << (LuaParser.INT - 32)) | (1 << (LuaParser.FLOAT - 32)) | (1 << (LuaParser.EXP - 32)) | (1 << (LuaParser.HEX - 32)) | (1 << (LuaParser.NORMALSTRING - 32)) | (1 << (LuaParser.CHARSTRING - 32)) | (1 << (LuaParser.LONGSTRING - 32)))) !== 0)) {
+                        if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << LuaParser.T__12) | (1 << LuaParser.T__20) | (1 << LuaParser.T__21) | (1 << LuaParser.T__22) | (1 << LuaParser.T__23) | (1 << LuaParser.T__27) | (1 << LuaParser.T__30))) !== 0) || ((((_la - 45)) & ~0x1F) === 0 && ((1 << (_la - 45)) & ((1 << (LuaParser.T__44 - 45)) | (1 << (LuaParser.T__45 - 45)) | (1 << (LuaParser.SPREAD - 45)) | (1 << (LuaParser.NAME - 45)) | (1 << (LuaParser.INT - 45)) | (1 << (LuaParser.FLOAT - 45)) | (1 << (LuaParser.EXP - 45)) | (1 << (LuaParser.HEX - 45)) | (1 << (LuaParser.NORMALSTRING - 45)) | (1 << (LuaParser.CHARSTRING - 45)) | (1 << (LuaParser.LONGSTRING - 45)))) !== 0)) {
                             {
                                 this.state = 192;
                                 this.explist1();
@@ -934,7 +934,7 @@ class LuaParser extends Parser_1.Parser {
                 this.state = 245;
                 this.unop();
                 this.state = 246;
-                this.exp();
+                this.operand();
             }
         }
         catch (re) {
@@ -999,11 +999,11 @@ class LuaParser extends Parser_1.Parser {
                         this.string();
                     }
                     break;
-                case LuaParser.T__23:
+                case LuaParser.SPREAD:
                     this.enterOuterAlt(_localctx, 6);
                     {
                         this.state = 253;
-                        this.match(LuaParser.T__23);
+                        this.match(LuaParser.SPREAD);
                     }
                     break;
                 case LuaParser.T__12:
@@ -1013,7 +1013,7 @@ class LuaParser extends Parser_1.Parser {
                         this.function();
                     }
                     break;
-                case LuaParser.T__24:
+                case LuaParser.T__23:
                 case LuaParser.NAME:
                     this.enterOuterAlt(_localctx, 8);
                     {
@@ -1021,16 +1021,16 @@ class LuaParser extends Parser_1.Parser {
                         this.prefixexp();
                     }
                     break;
-                case LuaParser.T__28:
+                case LuaParser.T__27:
                     this.enterOuterAlt(_localctx, 9);
                     {
                         this.state = 256;
                         this.tableconstructor();
                     }
                     break;
-                case LuaParser.T__31:
+                case LuaParser.T__30:
+                case LuaParser.T__44:
                 case LuaParser.T__45:
-                case LuaParser.T__46:
                     this.enterOuterAlt(_localctx, 10);
                     {
                         this.state = 257;
@@ -1072,14 +1072,14 @@ class LuaParser extends Parser_1.Parser {
                             this.match(LuaParser.NAME);
                         }
                         break;
-                    case LuaParser.T__24:
+                    case LuaParser.T__23:
                         {
                             this.state = 261;
-                            this.match(LuaParser.T__24);
+                            this.match(LuaParser.T__23);
                             this.state = 262;
                             this.exp();
                             this.state = 263;
-                            this.match(LuaParser.T__25);
+                            this.match(LuaParser.T__24);
                             this.state = 264;
                             this.varSuffix();
                         }
@@ -1226,11 +1226,11 @@ class LuaParser extends Parser_1.Parser {
                     this.enterOuterAlt(_localctx, 2);
                     {
                         this.state = 288;
-                        this.match(LuaParser.T__24);
+                        this.match(LuaParser.T__23);
                         this.state = 289;
                         this.exp();
                         this.state = 290;
-                        this.match(LuaParser.T__25);
+                        this.match(LuaParser.T__24);
                     }
                     break;
             }
@@ -1297,7 +1297,7 @@ class LuaParser extends Parser_1.Parser {
                 this.state = 303;
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
-                while ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << LuaParser.T__19) | (1 << LuaParser.T__24) | (1 << LuaParser.T__28))) !== 0) || ((((_la - 53)) & ~0x1F) === 0 && ((1 << (_la - 53)) & ((1 << (LuaParser.NORMALSTRING - 53)) | (1 << (LuaParser.CHARSTRING - 53)) | (1 << (LuaParser.LONGSTRING - 53)))) !== 0)) {
+                while ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << LuaParser.T__19) | (1 << LuaParser.T__23) | (1 << LuaParser.T__27))) !== 0) || ((((_la - 53)) & ~0x1F) === 0 && ((1 << (_la - 53)) & ((1 << (LuaParser.NORMALSTRING - 53)) | (1 << (LuaParser.CHARSTRING - 53)) | (1 << (LuaParser.LONGSTRING - 53)))) !== 0)) {
                     {
                         {
                             this.state = 300;
@@ -1311,14 +1311,14 @@ class LuaParser extends Parser_1.Parser {
                 this.state = 312;
                 this._errHandler.sync(this);
                 switch (this._input.LA(1)) {
-                    case LuaParser.T__26:
+                    case LuaParser.T__25:
                         {
                             this.state = 306;
-                            this.match(LuaParser.T__26);
+                            this.match(LuaParser.T__25);
                             this.state = 307;
                             this.exp();
                             this.state = 308;
-                            this.match(LuaParser.T__27);
+                            this.match(LuaParser.T__26);
                         }
                         break;
                     case LuaParser.T__18:
@@ -1357,25 +1357,25 @@ class LuaParser extends Parser_1.Parser {
             this.state = 321;
             this._errHandler.sync(this);
             switch (this._input.LA(1)) {
-                case LuaParser.T__24:
+                case LuaParser.T__23:
                     this.enterOuterAlt(_localctx, 1);
                     {
                         this.state = 314;
-                        this.match(LuaParser.T__24);
+                        this.match(LuaParser.T__23);
                         this.state = 316;
                         this._errHandler.sync(this);
                         _la = this._input.LA(1);
-                        if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << LuaParser.T__12) | (1 << LuaParser.T__20) | (1 << LuaParser.T__21) | (1 << LuaParser.T__22) | (1 << LuaParser.T__23) | (1 << LuaParser.T__24) | (1 << LuaParser.T__28))) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & ((1 << (LuaParser.T__31 - 32)) | (1 << (LuaParser.T__45 - 32)) | (1 << (LuaParser.T__46 - 32)) | (1 << (LuaParser.NAME - 32)) | (1 << (LuaParser.INT - 32)) | (1 << (LuaParser.FLOAT - 32)) | (1 << (LuaParser.EXP - 32)) | (1 << (LuaParser.HEX - 32)) | (1 << (LuaParser.NORMALSTRING - 32)) | (1 << (LuaParser.CHARSTRING - 32)) | (1 << (LuaParser.LONGSTRING - 32)))) !== 0)) {
+                        if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << LuaParser.T__12) | (1 << LuaParser.T__20) | (1 << LuaParser.T__21) | (1 << LuaParser.T__22) | (1 << LuaParser.T__23) | (1 << LuaParser.T__27) | (1 << LuaParser.T__30))) !== 0) || ((((_la - 45)) & ~0x1F) === 0 && ((1 << (_la - 45)) & ((1 << (LuaParser.T__44 - 45)) | (1 << (LuaParser.T__45 - 45)) | (1 << (LuaParser.SPREAD - 45)) | (1 << (LuaParser.NAME - 45)) | (1 << (LuaParser.INT - 45)) | (1 << (LuaParser.FLOAT - 45)) | (1 << (LuaParser.EXP - 45)) | (1 << (LuaParser.HEX - 45)) | (1 << (LuaParser.NORMALSTRING - 45)) | (1 << (LuaParser.CHARSTRING - 45)) | (1 << (LuaParser.LONGSTRING - 45)))) !== 0)) {
                             {
                                 this.state = 315;
                                 this.explist1();
                             }
                         }
                         this.state = 318;
-                        this.match(LuaParser.T__25);
+                        this.match(LuaParser.T__24);
                     }
                     break;
-                case LuaParser.T__28:
+                case LuaParser.T__27:
                     this.enterOuterAlt(_localctx, 2);
                     {
                         this.state = 319;
@@ -1445,18 +1445,18 @@ class LuaParser extends Parser_1.Parser {
             this.enterOuterAlt(_localctx, 1);
             {
                 this.state = 326;
-                this.match(LuaParser.T__24);
+                this.match(LuaParser.T__23);
                 this.state = 328;
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
-                if (_la === LuaParser.T__23 || _la === LuaParser.NAME) {
+                if (_la === LuaParser.SPREAD || _la === LuaParser.NAME) {
                     {
                         this.state = 327;
                         this.parlist1();
                     }
                 }
                 this.state = 330;
-                this.match(LuaParser.T__25);
+                this.match(LuaParser.T__24);
                 this.state = 331;
                 this.block();
                 this.state = 332;
@@ -1499,16 +1499,16 @@ class LuaParser extends Parser_1.Parser {
                                 this.state = 335;
                                 this.match(LuaParser.T__10);
                                 this.state = 336;
-                                this.match(LuaParser.T__23);
+                                this.match(LuaParser.SPREAD);
                             }
                         }
                     }
                     break;
-                case LuaParser.T__23:
+                case LuaParser.SPREAD:
                     this.enterOuterAlt(_localctx, 2);
                     {
                         this.state = 339;
-                        this.match(LuaParser.T__23);
+                        this.match(LuaParser.SPREAD);
                     }
                     break;
                 default:
@@ -1538,18 +1538,18 @@ class LuaParser extends Parser_1.Parser {
             this.enterOuterAlt(_localctx, 1);
             {
                 this.state = 342;
-                this.match(LuaParser.T__28);
+                this.match(LuaParser.T__27);
                 this.state = 344;
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
-                if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << LuaParser.T__12) | (1 << LuaParser.T__20) | (1 << LuaParser.T__21) | (1 << LuaParser.T__22) | (1 << LuaParser.T__23) | (1 << LuaParser.T__24) | (1 << LuaParser.T__26) | (1 << LuaParser.T__28))) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & ((1 << (LuaParser.T__31 - 32)) | (1 << (LuaParser.T__45 - 32)) | (1 << (LuaParser.T__46 - 32)) | (1 << (LuaParser.NAME - 32)) | (1 << (LuaParser.INT - 32)) | (1 << (LuaParser.FLOAT - 32)) | (1 << (LuaParser.EXP - 32)) | (1 << (LuaParser.HEX - 32)) | (1 << (LuaParser.NORMALSTRING - 32)) | (1 << (LuaParser.CHARSTRING - 32)) | (1 << (LuaParser.LONGSTRING - 32)))) !== 0)) {
+                if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << LuaParser.T__12) | (1 << LuaParser.T__20) | (1 << LuaParser.T__21) | (1 << LuaParser.T__22) | (1 << LuaParser.T__23) | (1 << LuaParser.T__25) | (1 << LuaParser.T__27) | (1 << LuaParser.T__30))) !== 0) || ((((_la - 45)) & ~0x1F) === 0 && ((1 << (_la - 45)) & ((1 << (LuaParser.T__44 - 45)) | (1 << (LuaParser.T__45 - 45)) | (1 << (LuaParser.SPREAD - 45)) | (1 << (LuaParser.NAME - 45)) | (1 << (LuaParser.INT - 45)) | (1 << (LuaParser.FLOAT - 45)) | (1 << (LuaParser.EXP - 45)) | (1 << (LuaParser.HEX - 45)) | (1 << (LuaParser.NORMALSTRING - 45)) | (1 << (LuaParser.CHARSTRING - 45)) | (1 << (LuaParser.LONGSTRING - 45)))) !== 0)) {
                     {
                         this.state = 343;
                         this.fieldlist();
                     }
                 }
                 this.state = 346;
-                this.match(LuaParser.T__29);
+                this.match(LuaParser.T__28);
             }
         }
         catch (re) {
@@ -1632,11 +1632,11 @@ class LuaParser extends Parser_1.Parser {
                     this.enterOuterAlt(_localctx, 1);
                     {
                         this.state = 360;
-                        this.match(LuaParser.T__26);
+                        this.match(LuaParser.T__25);
                         this.state = 361;
                         this.exp();
                         this.state = 362;
-                        this.match(LuaParser.T__27);
+                        this.match(LuaParser.T__26);
                         this.state = 363;
                         this.match(LuaParser.T__9);
                         this.state = 364;
@@ -1723,7 +1723,7 @@ class LuaParser extends Parser_1.Parser {
             {
                 this.state = 374;
                 _la = this._input.LA(1);
-                if (!(((((_la - 31)) & ~0x1F) === 0 && ((1 << (_la - 31)) & ((1 << (LuaParser.T__30 - 31)) | (1 << (LuaParser.T__31 - 31)) | (1 << (LuaParser.T__32 - 31)) | (1 << (LuaParser.T__33 - 31)) | (1 << (LuaParser.T__34 - 31)) | (1 << (LuaParser.T__35 - 31)) | (1 << (LuaParser.T__36 - 31)) | (1 << (LuaParser.T__37 - 31)) | (1 << (LuaParser.T__38 - 31)) | (1 << (LuaParser.T__39 - 31)) | (1 << (LuaParser.T__40 - 31)) | (1 << (LuaParser.T__41 - 31)) | (1 << (LuaParser.T__42 - 31)) | (1 << (LuaParser.T__43 - 31)) | (1 << (LuaParser.T__44 - 31)))) !== 0))) {
+                if (!(((((_la - 30)) & ~0x1F) === 0 && ((1 << (_la - 30)) & ((1 << (LuaParser.T__29 - 30)) | (1 << (LuaParser.T__30 - 30)) | (1 << (LuaParser.T__31 - 30)) | (1 << (LuaParser.T__32 - 30)) | (1 << (LuaParser.T__33 - 30)) | (1 << (LuaParser.T__34 - 30)) | (1 << (LuaParser.T__35 - 30)) | (1 << (LuaParser.T__36 - 30)) | (1 << (LuaParser.T__37 - 30)) | (1 << (LuaParser.T__38 - 30)) | (1 << (LuaParser.T__39 - 30)) | (1 << (LuaParser.T__40 - 30)) | (1 << (LuaParser.T__41 - 30)) | (1 << (LuaParser.T__42 - 30)) | (1 << (LuaParser.T__43 - 30)))) !== 0))) {
                     this._errHandler.recoverInline(this);
                 }
                 else {
@@ -1759,7 +1759,7 @@ class LuaParser extends Parser_1.Parser {
             {
                 this.state = 376;
                 _la = this._input.LA(1);
-                if (!(((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & ((1 << (LuaParser.T__31 - 32)) | (1 << (LuaParser.T__45 - 32)) | (1 << (LuaParser.T__46 - 32)))) !== 0))) {
+                if (!(((((_la - 31)) & ~0x1F) === 0 && ((1 << (_la - 31)) & ((1 << (LuaParser.T__30 - 31)) | (1 << (LuaParser.T__44 - 31)) | (1 << (LuaParser.T__45 - 31)))) !== 0))) {
                     this._errHandler.recoverInline(this);
                 }
                 else {
@@ -1911,7 +1911,7 @@ LuaParser.T__42 = 43;
 LuaParser.T__43 = 44;
 LuaParser.T__44 = 45;
 LuaParser.T__45 = 46;
-LuaParser.T__46 = 47;
+LuaParser.SPREAD = 47;
 LuaParser.NAME = 48;
 LuaParser.INT = 49;
 LuaParser.FLOAT = 50;
@@ -1978,9 +1978,9 @@ LuaParser._LITERAL_NAMES = [
     undefined, "';'", "'do'", "'end'", "'while'", "'if'", "'then'", "'elseif'",
     "'else'", "'for'", "'='", "','", "'in'", "'function'", "'local'", "'repeat'",
     "'until'", "'return'", "'break'", "'.'", "':'", "'nil'", "'false'", "'true'",
-    "'...'", "'('", "')'", "'['", "']'", "'{'", "'}'", "'+'", "'-'", "'*'",
-    "'/'", "'^'", "'%'", "'..'", "'<'", "'<='", "'>'", "'>='", "'=='", "'~='",
-    "'and'", "'or'", "'not'", "'#'"
+    "'('", "')'", "'['", "']'", "'{'", "'}'", "'+'", "'-'", "'*'", "'/'",
+    "'^'", "'%'", "'..'", "'<'", "'<='", "'>'", "'>='", "'=='", "'~='", "'and'",
+    "'or'", "'not'", "'#'", "'...'"
 ];
 LuaParser._SYMBOLIC_NAMES = [
     undefined, undefined, undefined, undefined, undefined, undefined, undefined,
@@ -1989,7 +1989,7 @@ LuaParser._SYMBOLIC_NAMES = [
     undefined, undefined, undefined, undefined, undefined, undefined, undefined,
     undefined, undefined, undefined, undefined, undefined, undefined, undefined,
     undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-    undefined, undefined, undefined, undefined, undefined, undefined, "NAME",
+    undefined, undefined, undefined, undefined, undefined, "SPREAD", "NAME",
     "INT", "FLOAT", "EXP", "HEX", "NORMALSTRING", "CHARSTRING", "LONGSTRING",
     "COMMENT", "LINE_COMMENT", "WS", "NEWLINE"
 ];
@@ -2038,7 +2038,7 @@ LuaParser._serializedATN = "\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37
     "\x02\x16\x02\x18\x02\x1A\x02\x1C\x02\x1E\x02 \x02\"\x02$\x02&\x02(\x02" +
     "*\x02,\x02.\x020\x022\x024\x026\x028\x02:\x02<\x02>\x02@\x02B\x02D\x02" +
     "F\x02H\x02J\x02L\x02N\x02P\x02R\x02\x02\x07\x04\x02\x03\x03\r\r\x03\x02" +
-    "!/\x04\x02\"\"01\x03\x0236\x03\x0279\u018D\x02Z\x03\x02\x02\x02\x04c\x03" +
+    " .\x04\x02!!/0\x03\x0236\x03\x0279\u018D\x02Z\x03\x02\x02\x02\x04c\x03" +
     "\x02\x02\x02\x06p\x03\x02\x02\x02\br\x03\x02\x02\x02\nv\x03\x02\x02\x02" +
     "\f|\x03\x02\x02\x02\x0E\x8B\x03\x02\x02\x02\x10\x90\x03\x02\x02\x02\x12" +
     "\x93\x03\x02\x02\x02\x14\xA1\x03\x02\x02\x02\x16\xA9\x03\x02\x02\x02\x18" +
@@ -2109,16 +2109,16 @@ LuaParser._serializedATN = "\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37
     "\xEF\xF0\x05L\'\x02\xF0\xF1\x05*\x16\x02\xF1\xF3\x03\x02\x02\x02\xF2\xEF" +
     "\x03\x02\x02\x02\xF3\xF6\x03\x02\x02\x02\xF4\xF2\x03\x02\x02\x02\xF4\xF5" +
     "\x03\x02\x02\x02\xF5+\x03\x02\x02\x02\xF6\xF4\x03\x02\x02\x02\xF7\xF8" +
-    "\x05N(\x02\xF8\xF9\x05*\x16\x02\xF9-\x03\x02\x02\x02\xFA\u0105\x07\x17" +
+    "\x05N(\x02\xF8\xF9\x05.\x18\x02\xF9-\x03\x02\x02\x02\xFA\u0105\x07\x17" +
     "\x02\x02\xFB\u0105\x07\x18\x02\x02\xFC\u0105\x07\x19\x02\x02\xFD\u0105" +
-    "\x05P)\x02\xFE\u0105\x05R*\x02\xFF\u0105\x07\x1A\x02\x02\u0100\u0105\x05" +
+    "\x05P)\x02\xFE\u0105\x05R*\x02\xFF\u0105\x071\x02\x02\u0100\u0105\x05" +
     "> \x02\u0101\u0105\x052\x1A\x02\u0102\u0105\x05D#\x02\u0103\u0105\x05" +
     ",\x17\x02\u0104\xFA\x03\x02\x02\x02\u0104\xFB\x03\x02\x02\x02\u0104\xFC" +
     "\x03\x02\x02\x02\u0104\xFD\x03\x02\x02\x02\u0104\xFE\x03\x02\x02\x02\u0104" +
     "\xFF\x03\x02\x02\x02\u0104\u0100\x03\x02\x02\x02\u0104\u0101\x03\x02\x02" +
     "\x02\u0104\u0102\x03\x02\x02\x02\u0104\u0103\x03\x02\x02\x02\u0105/\x03" +
-    "\x02\x02\x02\u0106\u010D\x072\x02\x02\u0107\u0108\x07\x1B\x02\x02\u0108" +
-    "\u0109\x05*\x16\x02\u0109\u010A\x07\x1C\x02\x02\u010A\u010B\x05:\x1E\x02" +
+    "\x02\x02\x02\u0106\u010D\x072\x02\x02\u0107\u0108\x07\x1A\x02\x02\u0108" +
+    "\u0109\x05*\x16\x02\u0109\u010A\x07\x1B\x02\x02\u010A\u010B\x05:\x1E\x02" +
     "\u010B\u010D\x03\x02\x02\x02\u010C\u0106\x03\x02\x02\x02\u010C\u0107\x03" +
     "\x02\x02\x02\u010D\u0111\x03\x02\x02\x02\u010E\u0110\x05:\x1E\x02\u010F" +
     "\u010E\x03\x02\x02\x02\u0110\u0113\x03\x02\x02\x02\u0111\u010F\x03\x02" +
@@ -2129,49 +2129,49 @@ LuaParser._serializedATN = "\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37
     "\x03\x02\x02\x02\u011B\u011D\x056\x1C\x02\u011C\u011E\x058\x1D\x02\u011D" +
     "\u011C\x03\x02\x02\x02\u011E\u011F\x03\x02\x02\x02\u011F\u011D\x03\x02" +
     "\x02\x02\u011F\u0120\x03\x02\x02\x02\u01205\x03\x02\x02\x02\u0121\u0127" +
-    "\x050\x19\x02\u0122\u0123\x07\x1B\x02\x02\u0123\u0124\x05*\x16\x02\u0124" +
-    "\u0125\x07\x1C\x02\x02\u0125\u0127\x03\x02\x02\x02\u0126\u0121\x03\x02" +
+    "\x050\x19\x02\u0122\u0123\x07\x1A\x02\x02\u0123\u0124\x05*\x16\x02\u0124" +
+    "\u0125\x07\x1B\x02\x02\u0125\u0127\x03\x02\x02\x02\u0126\u0121\x03\x02" +
     "\x02\x02\u0126\u0122\x03\x02\x02\x02\u01277\x03\x02\x02\x02\u0128\u0129" +
     "\x07\x16\x02\x02\u0129\u012B\x072\x02\x02\u012A\u0128\x03\x02\x02\x02" +
     "\u012A\u012B\x03\x02\x02\x02\u012B\u012C\x03\x02\x02\x02\u012C\u012D\x05" +
     "<\x1F\x02\u012D9\x03\x02\x02\x02\u012E\u0130\x058\x1D\x02\u012F\u012E" +
     "\x03\x02\x02\x02\u0130\u0133\x03\x02\x02\x02\u0131\u012F\x03\x02\x02\x02" +
     "\u0131\u0132\x03\x02\x02\x02\u0132\u013A\x03\x02\x02\x02\u0133\u0131\x03" +
-    "\x02\x02\x02\u0134\u0135\x07\x1D\x02\x02\u0135\u0136\x05*\x16\x02\u0136" +
-    "\u0137\x07\x1E\x02\x02\u0137\u013B\x03\x02\x02\x02\u0138\u0139\x07\x15" +
+    "\x02\x02\x02\u0134\u0135\x07\x1C\x02\x02\u0135\u0136\x05*\x16\x02\u0136" +
+    "\u0137\x07\x1D\x02\x02\u0137\u013B\x03\x02\x02\x02\u0138\u0139\x07\x15" +
     "\x02\x02\u0139\u013B\x072\x02\x02\u013A\u0134\x03\x02\x02\x02\u013A\u0138" +
-    "\x03\x02\x02\x02\u013B;\x03\x02\x02\x02\u013C\u013E\x07\x1B\x02\x02\u013D" +
+    "\x03\x02\x02\x02\u013B;\x03\x02\x02\x02\u013C\u013E\x07\x1A\x02\x02\u013D" +
     "\u013F\x05(\x15\x02\u013E\u013D\x03\x02\x02\x02\u013E\u013F\x03\x02\x02" +
-    "\x02\u013F\u0140\x03\x02\x02\x02\u0140\u0144\x07\x1C\x02\x02\u0141\u0144" +
+    "\x02\u013F\u0140\x03\x02\x02\x02\u0140\u0144\x07\x1B\x02\x02\u0141\u0144" +
     "\x05D#\x02\u0142\u0144\x05R*\x02\u0143\u013C\x03\x02\x02\x02\u0143\u0141" +
     "\x03\x02\x02\x02\u0143\u0142\x03\x02\x02\x02\u0144=\x03\x02\x02\x02\u0145" +
     "\u0146\x07\x0F\x02\x02\u0146\u0147\x05@!\x02\u0147?\x03\x02\x02\x02\u0148" +
-    "\u014A\x07\x1B\x02\x02\u0149\u014B\x05B\"\x02\u014A\u0149\x03\x02\x02" +
+    "\u014A\x07\x1A\x02\x02\u0149\u014B\x05B\"\x02\u014A\u0149\x03\x02\x02" +
     "\x02\u014A\u014B\x03\x02\x02\x02\u014B\u014C\x03\x02\x02\x02\u014C\u014D" +
-    "\x07\x1C\x02\x02\u014D\u014E\x05\x04\x03\x02\u014E\u014F\x07\x05\x02\x02" +
+    "\x07\x1B\x02\x02\u014D\u014E\x05\x04\x03\x02\u014E\u014F\x07\x05\x02\x02" +
     "\u014FA\x03\x02\x02\x02\u0150\u0153\x05&\x14\x02\u0151\u0152\x07\r\x02" +
-    "\x02\u0152\u0154\x07\x1A\x02\x02\u0153\u0151\x03\x02\x02\x02\u0153\u0154" +
-    "\x03\x02\x02\x02\u0154\u0157\x03\x02\x02\x02\u0155\u0157\x07\x1A\x02\x02" +
+    "\x02\u0152\u0154\x071\x02\x02\u0153\u0151\x03\x02\x02\x02\u0153\u0154" +
+    "\x03\x02\x02\x02\u0154\u0157\x03\x02\x02\x02\u0155\u0157\x071\x02\x02" +
     "\u0156\u0150\x03\x02\x02\x02\u0156\u0155\x03\x02\x02\x02\u0157C\x03\x02" +
-    "\x02\x02\u0158\u015A\x07\x1F\x02\x02\u0159\u015B\x05F$\x02\u015A\u0159" +
+    "\x02\x02\u0158\u015A\x07\x1E\x02\x02\u0159\u015B\x05F$\x02\u015A\u0159" +
     "\x03\x02\x02\x02\u015A\u015B\x03\x02\x02\x02\u015B\u015C\x03\x02\x02\x02" +
-    "\u015C\u015D\x07 \x02\x02\u015DE\x03\x02\x02\x02\u015E\u0164\x05H%\x02" +
-    "\u015F\u0160\x05J&\x02\u0160\u0161\x05H%\x02\u0161\u0163\x03\x02\x02\x02" +
-    "\u0162\u015F\x03\x02\x02\x02\u0163\u0166\x03\x02\x02\x02\u0164\u0162\x03" +
-    "\x02\x02\x02\u0164\u0165\x03\x02\x02\x02\u0165\u0168\x03\x02\x02\x02\u0166" +
-    "\u0164\x03\x02\x02\x02\u0167\u0169\x05J&\x02\u0168\u0167\x03\x02\x02\x02" +
-    "\u0168\u0169\x03\x02\x02\x02\u0169G\x03\x02\x02\x02\u016A\u016B\x07\x1D" +
-    "\x02\x02\u016B\u016C\x05*\x16\x02\u016C\u016D\x07\x1E\x02\x02\u016D\u016E" +
-    "\x07\f\x02\x02\u016E\u016F\x05*\x16\x02\u016F\u0175\x03\x02\x02\x02\u0170" +
-    "\u0171\x072\x02\x02\u0171\u0172\x07\f\x02\x02\u0172\u0175\x05*\x16\x02" +
-    "\u0173\u0175\x05*\x16\x02\u0174\u016A\x03\x02\x02\x02\u0174\u0170\x03" +
-    "\x02\x02\x02\u0174\u0173\x03\x02\x02\x02\u0175I\x03\x02\x02\x02\u0176" +
-    "\u0177\t\x02\x02\x02\u0177K\x03\x02\x02\x02\u0178\u0179\t\x03\x02\x02" +
-    "\u0179M\x03\x02\x02\x02\u017A\u017B\t\x04\x02\x02\u017BO\x03\x02\x02\x02" +
-    "\u017C\u017D\t\x05\x02\x02\u017DQ\x03\x02\x02\x02\u017E\u017F\t\x06\x02" +
-    "\x02\u017FS\x03\x02\x02\x02%VZ_ap\x83\x87\x9B\xB6\xC3\xC6\xCD\xD2\xD9" +
-    "\xE1\xE9\xF4\u0104\u010C\u0111\u0118\u011F\u0126\u012A\u0131\u013A\u013E" +
-    "\u0143\u014A\u0153\u0156\u015A\u0164\u0168\u0174";
+    "\u015C\u015D\x07\x1F\x02\x02\u015DE\x03\x02\x02\x02\u015E\u0164\x05H%" +
+    "\x02\u015F\u0160\x05J&\x02\u0160\u0161\x05H%\x02\u0161\u0163\x03\x02\x02" +
+    "\x02\u0162\u015F\x03\x02\x02\x02\u0163\u0166\x03\x02\x02\x02\u0164\u0162" +
+    "\x03\x02\x02\x02\u0164\u0165\x03\x02\x02\x02\u0165\u0168\x03\x02\x02\x02" +
+    "\u0166\u0164\x03\x02\x02\x02\u0167\u0169\x05J&\x02\u0168\u0167\x03\x02" +
+    "\x02\x02\u0168\u0169\x03\x02\x02\x02\u0169G\x03\x02\x02\x02\u016A\u016B" +
+    "\x07\x1C\x02\x02\u016B\u016C\x05*\x16\x02\u016C\u016D\x07\x1D\x02\x02" +
+    "\u016D\u016E\x07\f\x02\x02\u016E\u016F\x05*\x16\x02\u016F\u0175\x03\x02" +
+    "\x02\x02\u0170\u0171\x072\x02\x02\u0171\u0172\x07\f\x02\x02\u0172\u0175" +
+    "\x05*\x16\x02\u0173\u0175\x05*\x16\x02\u0174\u016A\x03\x02\x02\x02\u0174" +
+    "\u0170\x03\x02\x02\x02\u0174\u0173\x03\x02\x02\x02\u0175I\x03\x02\x02" +
+    "\x02\u0176\u0177\t\x02\x02\x02\u0177K\x03\x02\x02\x02\u0178\u0179\t\x03" +
+    "\x02\x02\u0179M\x03\x02\x02\x02\u017A\u017B\t\x04\x02\x02\u017BO\x03\x02" +
+    "\x02\x02\u017C\u017D\t\x05\x02\x02\u017DQ\x03\x02\x02\x02\u017E\u017F" +
+    "\t\x06\x02\x02\u017FS\x03\x02\x02\x02%VZ_ap\x83\x87\x9B\xB6\xC3\xC6\xCD" +
+    "\xD2\xD9\xE1\xE9\xF4\u0104\u010C\u0111\u0118\u011F\u0126\u012A\u0131\u013A" +
+    "\u013E\u0143\u014A\u0153\u0156\u015A\u0164\u0168\u0174";
 __decorate([
     Decorators_2.Override,
     Decorators_1.NotNull
@@ -3194,8 +3194,8 @@ class UnopexpContext extends ParserRuleContext_1.ParserRuleContext {
     unop() {
         return this.getRuleContext(0, UnopContext);
     }
-    exp() {
-        return this.getRuleContext(0, ExpContext);
+    operand() {
+        return this.getRuleContext(0, OperandContext);
     }
     get ruleIndex() { return LuaParser.RULE_unopexp; }
     enterRule(listener) {
@@ -3236,6 +3236,7 @@ class OperandContext extends ParserRuleContext_1.ParserRuleContext {
     string() {
         return this.tryGetRuleContext(0, StringContext);
     }
+    SPREAD() { return this.tryGetToken(LuaParser.SPREAD, 0); }
     function() {
         return this.tryGetRuleContext(0, FunctionContext);
     }
@@ -3655,6 +3656,7 @@ class Parlist1Context extends ParserRuleContext_1.ParserRuleContext {
     namelist() {
         return this.tryGetRuleContext(0, NamelistContext);
     }
+    SPREAD() { return this.tryGetToken(LuaParser.SPREAD, 0); }
     get ruleIndex() { return LuaParser.RULE_parlist1; }
     enterRule(listener) {
         if (listener.enterParlist1)

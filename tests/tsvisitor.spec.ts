@@ -22,6 +22,17 @@ test(t => {
 `);
 });
 
+
+test(t => {
+    t.is(testTransform("local a = #array + 1"), `let a = lualength(array) + 1;
+`);
+});
+
+test(t => {
+    t.is(testTransform(`a, b = c`), `[a, b] = c;
+`);
+});
+
 test(t => {
     t.is(testTransform(`local function test(a, b, c)
 end`), `const test = function(a, b, c) {
@@ -31,7 +42,7 @@ end`), `const test = function(a, b, c) {
 
 test(t => {
     t.is(testTransform(`for k = #test, 1, -1 do
-end`), `for (let k = table.getn(test); k >= 1; k += -1) {
+end`), `for (let k = lualength(test); k >= 1; k += -1) {
 }
 `);
 });
@@ -102,3 +113,85 @@ test(t => {
     t.is(testTransform(`local a = { TEST = 'a', ["a"] = 'b' }`), `let a = { TEST: 'a', ["a"]: 'b' }
 `)
 });
+
+function *pairs<T>(array: {[key:string]: T}) {
+    for (let i in array) {
+        yield [i, array[i]];
+    }
+}
+
+for (const [key, value] of pairs({ a: "b", c: "d"})) {
+
+}
+
+test(t => {
+    t.is(testTransform(`for keyword, value in pairs(SPELL_AURA_KEYWORD) do
+    DECLARATION_KEYWORD[keyword] = value
+end`), `for (const [keyword, value] of pairs(SPELL_AURA_KEYWORD)) {
+    DECLARATION_KEYWORD[keyword] = value;
+}
+`)
+});
+
+
+test(t => {
+    t.is(testTransform(`if not a ~= 4 then
+    b = 3.0
+elseif a == 4 then
+    b = 4 + (3 * 4)
+else
+    c = 4
+end`), `if (!a != 4) {
+    b = 3.0;
+} else if (a == 4) {
+    b = 4 + (3 * 4);
+} else {
+    c = 4;
+}
+`)
+});
+
+test(t => {
+    t.is(testTransform(`function a()
+    return 3, 5
+end`), `function a() {
+    return [3, 5];
+}
+`)
+});
+
+test(t => {
+    t.is(testTransform(`local OVALE, Ovale = ...`), `let [OVALE, Ovale] = [...__args];
+`)
+});
+
+
+test(t => {
+    t.is(testTransform(`local a = function(a) return 2 end`), `let a = function (a) {
+    return 2;
+}
+`)
+});
+
+
+test(t => {
+    t.is(testTransform(`local a = a
+a = 2;`), `let _a = a;
+_a = 2;
+`)
+});
+
+test(t => {
+    t.is(testTransform(`local a = not a or b`), `let a = !a || b;
+`)
+});
+
+
+test(t => {
+    t.is(testTransform(`local function SyntaxError(tokenStream, ...)
+    OvaleAST:Print(...)
+end`), `const SyntaxError = function(tokenStream, ...__args) {
+    OvaleAST.Print(...__args);
+}
+`);
+})
