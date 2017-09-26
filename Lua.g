@@ -14,10 +14,6 @@
 
 grammar Lua;
 
-options {
-  backtrack=true;
-}
-
 chunk : (stat (';')?)* (laststat (';')?)?;
 
 block : chunk;
@@ -119,72 +115,114 @@ binop : '+' | '-' | '*' | '/' | '^' | '%' | '..' |
 
 unop : '-' | 'not' | '#';
 
-number : INT | FLOAT | EXP | HEX;
+number : INT | HEX | FLOAT | HEX_FLOAT;
 
 string	: NORMALSTRING | CHARSTRING | LONGSTRING;
 
 
 // LEXER
 
-NAME	:('a'..'z'|'A'..'Z'|'_')('a'..'z'|'A'..'Z'|'_'|'0'..'9')*
-	;
-
-INT	: ('0'..'9')+;
-
-FLOAT 	:INT '.' INT ;
-
-EXP	: (INT| FLOAT) ('E'|'e') ('-')? INT;
-
-HEX	:'0x' ('0'..'9'| 'a'..'f')+ ;
-
-	
+NAME
+    : [a-zA-Z_][a-zA-Z_0-9]*
+    ;
 
 NORMALSTRING
-    :  '"' ( EscapeSequence | ~('\\'|'"') )* '"' 
+    : '"' ( EscapeSequence | ~('\\'|'"') )* '"' 
     ;
 
 CHARSTRING
-   :	'\'' ( EscapeSequence | ~('\''|'\\') )* '\''
-   ;
+    : '\'' ( EscapeSequence | ~('\''|'\\') )* '\''
+    ;
 
 LONGSTRING
-	:	'['('=')*'[' ( EscapeSequence | ~('\\'|']') )* ']'('=')*']'
-	;
+    : '[' NESTED_STR ']'
+    ;
+
+fragment
+NESTED_STR
+    : '=' NESTED_STR '='
+    | '[' .*? ']'
+    ;
+
+INT
+    : Digit+
+    ;
+
+HEX
+    : '0' [xX] HexDigit+
+    ;
+
+FLOAT
+    : Digit+ '.' Digit* ExponentPart?
+    | '.' Digit+ ExponentPart?
+    | Digit+ ExponentPart
+    ;
+
+HEX_FLOAT
+    : '0' [xX] HexDigit+ '.' HexDigit* HexExponentPart?
+    | '0' [xX] '.' HexDigit+ HexExponentPart?
+    | '0' [xX] HexDigit+ HexExponentPart
+    ;
+
+fragment
+ExponentPart
+    : [eE] [+-]? Digit+
+    ;
+
+fragment
+HexExponentPart
+    : [pP] [+-]? Digit+
+    ;
 
 fragment
 EscapeSequence
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
-    |   UnicodeEscape
-    |   OctalEscape
+    : '\\' [abfnrtvz"'\\]
+    | '\\' '\r'? '\n'
+    | DecimalEscape
+    | HexEscape
+    | UtfEscape
     ;
     
 fragment
-OctalEscape
-    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7')
+DecimalEscape
+    : '\\' Digit
+    | '\\' Digit Digit
+    | '\\' [0-2] Digit Digit
     ;
     
 fragment
-UnicodeEscape
-    :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
+HexEscape
+    : '\\' 'x' HexDigit HexDigit
     ;
-    
 fragment
-HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
-
-
+UtfEscape
+    : '\\' 'u{' HexDigit+ '}'
+    ;
+fragment
+Digit
+    : [0-9]
+    ;
+fragment
+HexDigit
+    : [0-9a-fA-F]
+    ;
 COMMENT
-    :   '--[[' ( . )*? ']]' {skip();}
+    : '--[' NESTED_STR ']' -> channel(HIDDEN)
     ;
     
 LINE_COMMENT
-    : '--' ~('\n'|'\r')* '\r'? '\n' {skip();}
+    : '--'
+    (                                               // --
+    | '[' '='*                                      // --[==
+    | '[' '='* ~('='|'['|'\r'|'\n') ~('\r'|'\n')*   // --[==AA
+    | ~('['|'\r'|'\n') ~('\r'|'\n')*                // --AAA
+    ) ('\r\n'|'\r'|'\n'|EOF)
+    -> channel(HIDDEN)
     ;
     
-    
-WS  :  (' '|'\t'|'\u000C') {skip();}
+WS  
+    : [ \t\u000C\r\n]+ -> skip
     ;
-    
-NEWLINE	: ('\r')? '\n' {skip();}
-	;
+SHEBANG
+    : '#' '!' ~('\n'|'\r')* -> channel(HIDDEN)
+    ;

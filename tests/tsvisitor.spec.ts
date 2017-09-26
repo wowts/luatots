@@ -114,16 +114,6 @@ test(t => {
 `)
 });
 
-function *pairs<T>(array: {[key:string]: T}) {
-    for (let i in array) {
-        yield [i, array[i]];
-    }
-}
-
-for (const [key, value] of pairs({ a: "b", c: "d"})) {
-
-}
-
 test(t => {
     t.is(testTransform(`for keyword, value in pairs(SPELL_AURA_KEYWORD) do
     DECLARATION_KEYWORD[keyword] = value

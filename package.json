@@ -4,20 +4,23 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "antlr4ts": "antlr4ts -visitor Lua.g",
+    "antlr": "antlr4ts -visitor Lua.g",
     "prepublish": "tsc -p .",
     "prepublish:debug": "tsc -p . && node dist/index.js",
     "prepublish:watch": "tsc -w",
     "test": "ava dist/tests",
     "test:watch": "ava --watch dist/tests",
-    "test:debug": "node node_modules/ava/profile.js dist/tests"
+    "test:debug": "node node_modules/ava/profile.js dist/tests",
+    "ovale": "node dist/index.js \"C:/Program Files (x86)/World of Warcraft Public Test/Interface/AddOns/Ovale\" ../ovale-ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "antlr4ts": "0.4.1-alpha.0"
+    "antlr4ts": "0.4.1-alpha.0",
+    "mkdirp": "^0.5.1"
   },
   "devDependencies": {
+    "@types/mkdirp": "^0.5.1",
     "antlr4ts-cli": "0.4.0-alpha.4",
     "typescript": "2.3.4",
     "@types/node": "^8.0.0",

@@ -452,7 +452,7 @@ export class TsVisitor implements LuaVisitor<void> {
 
     visitVarSuffix(ctx: VarSuffixContext) {
         for (let i = 0; ; i++) {
-            const child = ctx.tryGetChild(0, NameAndArgsContext);
+            const child = ctx.tryGetChild(i, NameAndArgsContext);
             if (!child) break;
             child.accept(this);
         }

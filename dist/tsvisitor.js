@@ -415,7 +415,7 @@ class TsVisitor {
     }
     visitVarSuffix(ctx) {
         for (let i = 0;; i++) {
-            const child = ctx.tryGetChild(0, LuaParser_1.NameAndArgsContext);
+            const child = ctx.tryGetChild(i, LuaParser_1.NameAndArgsContext);
             if (!child)
                 break;
             child.accept(this);
