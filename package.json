@@ -11,10 +11,13 @@
     "test": "ava dist/tests",
     "test:watch": "ava --watch dist/tests",
     "test:debug": "node node_modules/ava/profile.js dist/tests",
-    "ovale": "node dist/index.js \"C:/Program Files (x86)/World of Warcraft Public Test/Interface/AddOns/Ovale\" ../ovale-ts"
+    "ovale": "node dist/index.js \"D:/Applications/World of Warcraft/Interface/AddOns/Ovale\" ../ovale-ts"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Sidoine De Wispelaere",
+  "repository": {
+    "url": "https://github.com/Sidoine/luatots"
+  },
+  "license": "MIT",
   "dependencies": {
     "antlr4ts": "0.4.1-alpha.0",
     "mkdirp": "^0.5.1"

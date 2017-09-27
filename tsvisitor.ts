@@ -1,5 +1,5 @@
 import { LuaVisitor } from './LuaVisitor';
-import { ChunkContext, BlockContext, NumberContext, LuaParser, StatContext, IfContext, AssignmentContext, Varlist1Context, Explist1Context, LocalvardeclContext, NamelistContext, VarContext, ExpContext, OperandContext, BinopContext, LocalfunctiondeclContext, FuncbodyContext, Parlist1Context, ForContext, UnopContext, UnopexpContext, FuncnameContext, ArgsContext, NameAndArgsContext, VarSuffixContext, StringContext, LaststatContext, FunctiondeclContext, TableconstructorContext, FieldlistContext, FieldContext, ForinContext, ElseifContext, ElseContext, FunctionContext, VarOrExpContext, PrefixexpContext, FunctioncallContext, DoblockContext, WhileContext } from './LuaParser';
+import { ChunkContext, BlockContext, NumberContext, LuaParser, StatContext, IfContext, AssignmentContext, Varlist1Context, Explist1Context, LocalvardeclContext, NamelistContext, VarContext, ExpContext, OperandContext, BinopContext, LocalfunctiondeclContext, FuncbodyContext, Parlist1Context, ForContext, UnopContext, UnopexpContext, FuncnameContext, ArgsContext, NameAndArgsContext, VarSuffixContext, StringContext, LaststatContext, FunctiondeclContext, TableconstructorContext, FieldlistContext, FieldContext, ForinContext, ElseifContext, ElseContext, FunctionContext, VarOrExpContext, PrefixexpContext, FunctioncallContext, DoblockContext, WhileContext, RepeatContext } from './LuaParser';
 
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode';
 import { ParseTree } from 'antlr4ts/tree/ParseTree';
@@ -10,6 +10,7 @@ import { Console } from 'console';
 
 interface Block {
     currentClass?: string;
+    root?: boolean;
 }
 
 export interface CompilerError {
@@ -21,10 +22,12 @@ export class TsVisitor implements LuaVisitor<void> {
     public result: string = "";
     private tabs = 0;
     private blocks: Block[] = [];
-    private currentBlock: Block = {};
+    private currentBlock: Block = { root: true };
     private nameMapping: { [key:string]: string} = {};
     public errors: CompilerError[] = [];
-
+    private entryAdded = false;
+    private moduleVariableName: string|undefined = undefined;
+    
     visitBlock(ctx: BlockContext): void {
        this.result += "{";
         if (ctx.childCount > 0) {
@@ -116,8 +119,29 @@ export class TsVisitor implements LuaVisitor<void> {
         ctx.getChild(0, BlockContext).accept(this);
     }
 
+    private getModule(ctx: Explist1Context) {
+        if (ctx.childCount > 1) return undefined;
+        const exp = ctx.getChild(0, ExpContext);
+        const operand = exp.getChild(0, OperandContext);
+        const prefixExp = operand.tryGetChild(0, PrefixexpContext);
+        if (!prefixExp) return undefined;
+        const varOrExp = prefixExp.tryGetChild(0, VarOrExpContext);
+        if (!varOrExp) return undefined;
+        const varr = varOrExp.tryGetChild(0, VarContext);
+        if (!varr) return undefined;
+        const name = varr.NAME();
+        if (!name) return undefined;
+        if (name.text === this.moduleVariableName) {
+            const suffix = varr.tryGetChild(0, VarSuffixContext);
+            if (!suffix) return undefined;
+            return suffix.NAME();
+        }
+    }
+
     visitAssignment(ctx: AssignmentContext): void {
         const vars = ctx.getChild<Varlist1Context>(0, Varlist1Context);
+        const exps = ctx.getChild<Explist1Context>(0, Explist1Context);
+        
         if (vars.childCount> 1) {
             this.result += "[";
         }
@@ -126,13 +150,23 @@ export class TsVisitor implements LuaVisitor<void> {
             this.result += "]";
         }
         this.result += " = ";
-        const exps = ctx.getChild<Explist1Context>(0, Explist1Context);
         exps.accept(this);
     }
 
     visitLocalvardecl(ctx: LocalvardeclContext):void{
         const namelist = ctx.getChild<NamelistContext>(0, NamelistContext);
         const explist1 = ctx.tryGetChild(0, Explist1Context);
+        const module = explist1 && this.getModule(explist1);
+        
+        if (module) {
+            this.result += "import { ";
+            namelist.accept(this);
+            this.result += " } from \"./";
+            this.result += module.text;
+            this.result += "\"";
+            return;
+        }
+
         this.result += "let ";
         if (namelist.childCount>  1){
             this.result += "[";
@@ -149,6 +183,14 @@ export class TsVisitor implements LuaVisitor<void> {
         if (explist1) {
             this.result += " = ";
             explist1.accept(this);
+            const firstChild = explist1.tryGetChild(0, ExpContext);
+            let isList = explist1.childCount > 1;
+            if (firstChild) {
+                const operand = firstChild.tryGetChild(0, OperandContext);
+                if (operand && operand.SPREAD() && this.blocks[this.blocks.length - 1].root) {
+                    this.moduleVariableName = namelist.NAME(1).text;
+                }
+            }
         }
 
         if (needMapping) this.nameMapping[namelist.text] = "_" + namelist.text;        
@@ -193,6 +235,16 @@ export class TsVisitor implements LuaVisitor<void> {
         this.result += ") ";
         ctx.getChild(0, BlockContext).accept(this);
     }
+    
+    visitRepeat(ctx: RepeatContext) {
+        this.result += "do ";
+        ctx.getChild(0, BlockContext).accept(this);
+        this.result += "\n";
+        this.writeTabs();
+        this.result += "while (!(";
+        ctx.getChild(0, ExpContext).accept(this);
+        this.result += "))";
+    }
 
     visitFunctioncall(ctx: FunctioncallContext) {
         for (let i = 0; i < ctx.childCount; i++) {
@@ -201,20 +253,55 @@ export class TsVisitor implements LuaVisitor<void> {
     }
 
     visitExplist1(ctx: Explist1Context) {
+        // Either need a list or an array
+        // If it's the arguments of a function, it needs a list
         let needList = ctx.parent instanceof ArgsContext;
-        if (ctx.parent instanceof AssignmentContext) {
-            const assignement = <AssignmentContext>ctx.parent;
-            const vars = assignement.getChild(0, Varlist1Context);
-            if (vars.childCount > 1) needList = false;
-        }
+        // if (ctx.parent instanceof AssignmentContext) {
+        //     // If it is assigned to more than one variable, it needs a list
+        //     const assignement = <AssignmentContext>ctx.parent;
+        //     const vars = assignement.getChild(0, Varlist1Context);
+        //     if (vars.childCount > 1) needList = false;
+        // }
+
+        // if (ctx.parent instanceof LocalvardeclContext) {
+        //     const localvardeclContext = <LocalvardeclContext>ctx.parent;
+        //     const vars = localvardeclContext.getChild(0, NamelistContext);
+        //     if (vars.childCount > 1) needList = false;
+        // }
+
         const firstChild = ctx.tryGetChild(0, ExpContext);
+
+        // It's a list if there is more than one member
         let isList = ctx.childCount > 1;
         if (firstChild) {
             const operand = firstChild.tryGetChild(0, OperandContext);
-            if (operand && operand.SPREAD()) isList = true;
+            if (operand && operand.SPREAD()) {
+                if (!needList) {
+                    if (this.blocks[this.blocks.length - 1].root) {
+                        if (!this.entryAdded) {
+                            this.result = "import __addon from \"addon\";\n" + this.result;
+                            this.entryAdded = true;
+                        }
+                        this.result += "__addon";
+                    }
+                    else {
+                        this.result += "__args";
+                    }
+                    return;
+                }
+                else {
+                    isList = false;
+                }                
+            };
         }
+
         if (isList) {
+            // If it's a list but an array is expected, change it to an array
             if (!needList) this.result += '[';
+        }
+        else {
+            // If it's an array but a list is expected, spread it
+         //   if (needList) this.result += "...";
         }
 
         for (let i = 0; ; i++) {
@@ -230,17 +317,21 @@ export class TsVisitor implements LuaVisitor<void> {
     }
 
     visitTableconstructor(ctx: TableconstructorContext) {
-        this.result += '{ ';
+        this.result += '{\n';
+        this.tabs++;
         const table = ctx.tryGetChild(0, FieldlistContext);
         table && table.accept(this);
-        this.result += ' }';
+        this.tabs--;
+        this.writeTabs();
+        this.result += '}';
     }
 
     visitFieldlist(ctx: FieldlistContext) {
         for (let i = 0; ; i++) {
             const child = ctx.tryGetChild(i, FieldContext);
             if (!child) break;
-            if (i > 0) this.result += ', ';
+            if (i > 0) this.result += ',\n';
+            this.writeTabs();
 
             let key: string;
             if (child.NAME()) {
@@ -260,6 +351,7 @@ export class TsVisitor implements LuaVisitor<void> {
                 child.getChild(1, ExpContext).accept(this);
             }
         }
+        this.result += "\n";
     }
 
     visitForin(ctx: ForinContext) {
@@ -523,6 +615,19 @@ export class TsVisitor implements LuaVisitor<void> {
         }
     }
 
+    private convertLongString(longString: string) {
+        const matchSimple =  longString.match(/^\[\[([^]*)\]\]$/);
+        if (matchSimple) {
+            return matchSimple[1];
+        }
+
+        const matchDouble = longString.match(/^\[=\[([^]*)\]=\]$/)
+        if (matchDouble) {
+            return matchDouble[1];
+        }
+        return undefined;
+    }
+
     visitString(ctx: StringContext) {
         const string = ctx.NORMALSTRING();
         if (string) {
@@ -533,7 +638,13 @@ export class TsVisitor implements LuaVisitor<void> {
         }
         else {
             this.result += '`';
-            this.result += ctx.LONGSTRING().text;
+            const result = this.convertLongString(ctx.LONGSTRING().text);
+            if (!result) {
+                this.errors.push({ message: "Unable to parse long string", position: ctx.start.startIndex });
+            }
+            else {
+                this.result += result.replace('`', '\\`');    
+            }
             this.result += '`';
         }
     }
@@ -553,100 +664,10 @@ export class TsVisitor implements LuaVisitor<void> {
             node.getChild(i).accept(this);
         }
     }
-    /**
-     * Visit a terminal node, and return a user-defined result of the operation.
-     *
-     * @param node The {@link TerminalNode} to visit.
-     * @return The result of visiting the node.
-     */
-    visitTerminal(node: TerminalNode):void {
-        // switch (node.symbol.type) {
-        //     case LuaParser.INT:
-        //         this.result += node.symbol.text;
-        //         break;
-        //     case LuaParser.NAME:
-        //         this.result += node.symbol.text;
-        //         break;
-        //     case LuaParser.NORMALSTRING:
-        //         this.result += `"${node.symbol.text}"`;
-        //         break;
-        //     case LuaParser.T__0:
-        //         if (node.symbol.text !== ';') console.log(`Unexpected line separator ${node.symbol.text}`);
-        //         this.result += ';';
-        //         break;
-        //     case LuaParser.T__1:
-        //         if (node.symbol.text !== '=') console.log(`Unexpected parameter separator ${node.symbol.text}`);
-        //         this.result += "=";
-        //         break;
-        //     case LuaParser.T__3:
-        //         if (node.symbol.text !== 'end') console.log(`Unexpected end ${node.symbol.text}`);
-        //         this.result += "}";
-        //         break;
-        //     case LuaParser.T__8:
-        //         if (node.symbol.text !== 'then') console.log(`Unexpected end ${node.symbol.text}`);
-        //         this.result += "{";
-        //         break;
-        //     case LuaParser.T__10:
-        //         if (node.symbol.text !== 'else') console.log(`Unexpected else ${node.symbol.text}`);
-        //         this.result += "else";
-        //         break;
-        //     case LuaParser.T__12:
-        //         if (node.symbol.text !== ',') console.log(`Unexpected parameter separator ${node.symbol.text}`);
-        //         this.result += ",";
-        //         break;
-        //     case LuaParser.T__14:
-        //         if (node.symbol.text !== 'function') console.log(`Unexpected function ${node.symbol.text}`);
-        //         this.result += "function  ";
-        //         break;
-        //     case LuaParser.T__15:
-        //         this.result += "var ";
-        //         break;
-        //     case LuaParser.T__16:
-        //         if (node.symbol.text !== 'return') console.log(`Unexpected return ${node.symbol.text}`);
-        //         this.result += "return ";
-        //         break;
-        //     case LuaParser.T__17:
-        //         if (node.symbol.text !== '[') console.log(`Unexpected [ ${node.symbol.text}`);
-        //         this.result += "[";
-        //         break;
-        //     case LuaParser.T__19:
-        //         if (node.symbol.text !== ':') console.log(`Unexpected : ${node.symbol.text}`);
-        //         this.result += ".";
-        //         break;
-        //     case LuaParser.T__24:
-        //         if (node.symbol.text !== '(') console.log(`Unexpected ( ${node.symbol.text}`);
-        //         this.result += "(";
-        //         break;
-        //     case LuaParser.T__25:
-        //         if (node.symbol.text !== ')') console.log(`Unexpected ) ${node.symbol.text}`);
-        //         this.result += ")";
-        //         break;
-        //     case LuaParser.T__26:
-        //         if (node.symbol.text !== 'return') console.log(`Unexpected return ${node.symbol.text}`);
-        //         this.result += "return ";
-        //         break;
-        //     case LuaParser.T__27:
-        //         if (node.symbol.text !== ']') console.log(`Unexpected ] ${node.symbol.text}`);
-        //         this.result += "]";
-        //         break;
-        //     case LuaParser.T__30:
-        //         if (node.symbol.text !== '+') console.log(`Unexpected + ${node.symbol.text}`);
-        //         this.result += "+";
-        //         break;
-        //     case LuaParser.T__40:
-        //         if (node.symbol.text !== '+') console.log(`Unexpected + ${node.symbol.text}`);
-        //         this.result += ">=";
-        //         break;
-        //     case LuaParser.T__43:
-        //         if (node.symbol.text !== 'and') console.log(`Unexpected and ${node.symbol.text}`);
-        //         this.result += "&&";
-        //         break;
-        //     default:
-        //         this.result += node.symbol.text;
-        //         console.log(`Unknown terminal ${node.symbol.type} of text ${node.symbol.text}`);
-        // }
-        // node.text;
+
+    visitTerminal(terminal: TerminalNode) {
     }
+
     /**
      * Visit an error node, and return a user-defined result of the operation.
      *

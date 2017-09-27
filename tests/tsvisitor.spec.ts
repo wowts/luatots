@@ -47,6 +47,32 @@ end`), `for (let k = lualength(test); k >= 1; k += -1) {
 `);
 });
 
+
+test(t => {
+    t.is(testTransform(`a = [[test
+text]]`), `a = \`test
+text\`;
+`);
+});
+
+test(t => {
+    t.is(testTransform(`a = [=[te\`st
+text]=]`), `a = \`te\\\`st
+text\`;
+`);
+});
+
+
+test(t => {
+    t.is(testTransform(`repeat
+    a = a + 1
+until a > 5`), `do {
+    a = a + 1;
+}
+while (!(a > 5));
+`);
+});
+
 test(t => {
     t.is(testTransform(`local k, v = o:method()`), `let [k, v] = o.method();
 `);
@@ -104,13 +130,23 @@ function Third() {
 });
 
 test(t => {
-    t.is(testTransform(`local a = { 'a', 'b', 'c' }`), `let a = { 1: 'a', 2: 'b', 3: 'c' }
+    t.is(testTransform(`local a = { 'a', 'b', 'c' }`), `let a = {
+    1: 'a',
+    2: 'b',
+    3: 'c'
+}
 `)
 });
 
 
 test(t => {
-    t.is(testTransform(`local a = { TEST = 'a', ["a"] = 'b' }`), `let a = { TEST: 'a', ["a"]: 'b' }
+    t.is(testTransform(`local a = { TEST = 'a', ["a"] = 'b', c = { d = "z" } }`), `let a = {
+    TEST: 'a',
+    ["a"]: 'b',
+    c: {
+        d: "z"
+    }
+}
 `)
 });
 
@@ -151,12 +187,6 @@ end`), `function a() {
 });
 
 test(t => {
-    t.is(testTransform(`local OVALE, Ovale = ...`), `let [OVALE, Ovale] = [...__args];
-`)
-});
-
-
-test(t => {
     t.is(testTransform(`local a = function(a) return 2 end`), `let a = function (a) {
     return 2;
 }
@@ -183,5 +213,17 @@ test(t => {
 end`), `const SyntaxError = function(tokenStream, ...__args) {
     OvaleAST.Print(...__args);
 }
+`);
+})
+
+
+test(t => {
+    t.is(testTransform(`local AppName, App = ...
+local Me = App:NewModule("ModuleName", "dep1", "dep2")
+local Test = App.Test
+`), `import __addon from "addon";
+let [AppName, App] = __addon;
+let Me = App.NewModule("ModuleName", "dep1", "dep2");
+import { Test } from "./Test";
 `);
 })
