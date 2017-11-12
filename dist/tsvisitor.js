@@ -39,17 +39,6 @@ class TsVisitor {
             if (!child)
                 break;
             const content = child.getChild(0);
-            if (content instanceof LuaParser_1.FunctiondeclContext) {
-                const className = this.getClassName(content);
-                if (className !== this.currentBlock.currentClass) {
-                    this.endClass();
-                    if (className)
-                        this.startClass(className);
-                }
-            }
-            else if (this.currentBlock.currentClass) {
-                this.endClass();
-            }
             child.accept(this);
             const lastChar = this.result[this.result.length - 1];
             if (lastChar === '}' || lastChar === "\n")
@@ -140,14 +129,6 @@ class TsVisitor {
         const namelist = ctx.getChild(0, LuaParser_1.NamelistContext);
         const explist1 = ctx.tryGetChild(0, LuaParser_1.Explist1Context);
         const module = explist1 && this.getModule(explist1);
-        if (module) {
-            this.result += "import { ";
-            namelist.accept(this);
-            this.result += " } from \"./";
-            this.result += module.text;
-            this.result += "\"";
-            return;
-        }
         this.result += "let ";
         if (namelist.childCount > 1) {
             this.result += "[";
@@ -229,17 +210,6 @@ class TsVisitor {
         // Either need a list or an array
         // If it's the arguments of a function, it needs a list
         let needList = ctx.parent instanceof LuaParser_1.ArgsContext;
-        // if (ctx.parent instanceof AssignmentContext) {
-        //     // If it is assigned to more than one variable, it needs a list
-        //     const assignement = <AssignmentContext>ctx.parent;
-        //     const vars = assignement.getChild(0, Varlist1Context);
-        //     if (vars.childCount > 1) needList = false;
-        // }
-        // if (ctx.parent instanceof LocalvardeclContext) {
-        //     const localvardeclContext = <LocalvardeclContext>ctx.parent;
-        //     const vars = localvardeclContext.getChild(0, NamelistContext);
-        //     if (vars.childCount > 1) needList = false;
-        // }
         const firstChild = ctx.tryGetChild(0, LuaParser_1.ExpContext);
         // It's a list if there is more than one member
         let isList = ctx.childCount > 1;
@@ -269,10 +239,6 @@ class TsVisitor {
             // If it's a list but an array is expected, change it to an array
             if (!needList)
                 this.result += '[';
-        }
-        else {
-            // If it's an array but a list is expected, spread it
-            //   if (needList) this.result += "...";
         }
         for (let i = 0;; i++) {
             const exp = ctx.tryGetChild(i, LuaParser_1.ExpContext);
@@ -365,7 +331,7 @@ class TsVisitor {
         }
     }
     visitLocalfunctiondecl(ctx) {
-        this.result += `const ${ctx.NAME().text} = function`;
+        this.result += `function ${ctx.NAME().text}`;
         ctx.getChild(0, LuaParser_1.FuncbodyContext).accept(this);
     }
     visitFunction(ctx) {
@@ -374,14 +340,23 @@ class TsVisitor {
     }
     visitFunctiondecl(ctx) {
         const name = ctx.getChild(0, LuaParser_1.FuncnameContext);
-        if (name.NAME().length > 1) {
-            this.result += name.NAME(1).text;
+        const className = this.getClassName(ctx);
+        if (className) {
+            this.result += `${className}.${name.NAME(1).text} = function(self`;
+            const funcBody = ctx.getChild(0, LuaParser_1.FuncbodyContext);
+            const parlist1 = funcBody.tryGetChild(0, LuaParser_1.Parlist1Context);
+            if (parlist1) {
+                this.result += ", ";
+                parlist1.accept(this);
+            }
+            this.result += ') ';
+            funcBody.getChild(0, LuaParser_1.BlockContext).accept(this);
         }
         else {
             this.result += 'function ';
             name.accept(this);
+            ctx.getChild(0, LuaParser_1.FuncbodyContext).accept(this);
         }
-        ctx.getChild(0, LuaParser_1.FuncbodyContext).accept(this);
     }
     getClassName(ctx) {
         const name = ctx.getChild(0, LuaParser_1.FuncnameContext);
@@ -535,18 +510,6 @@ class TsVisitor {
             ctx.getChild(0).accept(this);
         }
     }
-    // visitExp(ctx: ExpContext):void{
-    //     const operand = ctx.getChild<OperandContext>(0, OperandContext);
-    //     let i = 0;
-    //     while (true) {
-    //         const binop = ctx.tryGetChild<BinopContext>(i, BinopContext);
-    //         if (!binop) {
-    //             break;
-    //         }
-    //         const exp = ctx.tryGetChild<
-    //         i++;
-    //     }
-    // }
     visitVar(ctx) {
         const exp = ctx.tryGetChild(0, LuaParser_1.ExpContext);
         if (exp) {
@@ -631,7 +594,6 @@ class TsVisitor {
         this.currentBlock.currentClass = name;
         this.result += `class ${this.currentBlock.currentClass} {\n`;
         this.tabs++;
-        // this.writeTabs();
     }
     endClass() {
         if (!this.currentBlock.currentClass)

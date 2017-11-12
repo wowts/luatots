@@ -35,7 +35,7 @@ test(t => {
 
 test(t => {
     t.is(testTransform(`local function test(a, b, c)
-end`), `const test = function(a, b, c) {
+end`), `function test(a, b, c) {
 }
 `);
 });
@@ -99,11 +99,9 @@ test(t => {
 end
 
 function Class:Second()
-end`), `class Class {
-    First() {
-    }
-    Second() {
-    }
+end`), `Class.First = function(self) {
+}
+Class.Second = function(self) {
 }
 `);
 });
@@ -118,11 +116,9 @@ end
 
 function Third()
 end
-`), `class Class {
-    First() {
-    }
-    Second() {
-    }
+`), `Class.First = function(self) {
+}
+Class.Second = function(self) {
 }
 function Third() {
 }
@@ -210,7 +206,7 @@ test(t => {
 test(t => {
     t.is(testTransform(`local function SyntaxError(tokenStream, ...)
     OvaleAST:Print(...)
-end`), `const SyntaxError = function(tokenStream, ...__args) {
+end`), `function SyntaxError(tokenStream, ...__args) {
     OvaleAST.Print(...__args);
 }
 `);
@@ -224,6 +220,6 @@ local Test = App.Test
 `), `import __addon from "addon";
 let [AppName, App] = __addon;
 let Me = App.NewModule("ModuleName", "dep1", "dep2");
-import { Test } from "./Test";
+let Test = App.Test;
 `);
 })
