@@ -8,11 +8,9 @@
             "type": "node",
             "request": "launch",
             "name": "Debug tests",
-            "program": "${workspaceRoot}/node_modules/ava/profile.js",
-            "args": ["${workspaceRoot}/dist/tests/tsvisitor.spec.js"],
-            "outFiles": [
-                "${workspaceRoot}/dist/**/*.js"
-            ],
+            "program": "${workspaceRoot}/../node_modules/ava/profile.js",
+            "args": ["${workspaceRoot}/dist/tsvisitor.spec.js"],
+            "outFiles": ["${workspaceRoot}/dist/**/*.js"],
             "protocol": "inspector"
         },
         {
@@ -20,7 +18,7 @@
             "request": "launch",
             "name": "Debug",
             "program": "${workspaceRoot}/dist/index.js",
-            "outFiles": [ "${workspaceRoot}/dist/**/*.js" ],
+            "outFiles": ["${workspaceRoot}/dist/**/*.js"],
             "args": [
                 "D:/Applications/World of Warcraft/Interface/AddOns/Ovale",
                 "../ovale-ts"

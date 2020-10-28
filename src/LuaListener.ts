@@ -1,49 +1,49 @@
-// Generated from Lua.g by ANTLR 4.6-SNAPSHOT
+// Generated from Lua.g by ANTLR 4.7.3-SNAPSHOT
 
 
-import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener';
+import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 
-import { ChunkContext } from './LuaParser';
-import { BlockContext } from './LuaParser';
-import { StatContext } from './LuaParser';
-import { DoblockContext } from './LuaParser';
-import { WhileContext } from './LuaParser';
-import { IfContext } from './LuaParser';
-import { ElseifContext } from './LuaParser';
-import { ElseContext } from './LuaParser';
-import { ForContext } from './LuaParser';
-import { ForinContext } from './LuaParser';
-import { FunctiondeclContext } from './LuaParser';
-import { LocalfunctiondeclContext } from './LuaParser';
-import { LocalvardeclContext } from './LuaParser';
-import { AssignmentContext } from './LuaParser';
-import { RepeatContext } from './LuaParser';
-import { LaststatContext } from './LuaParser';
-import { FuncnameContext } from './LuaParser';
-import { Varlist1Context } from './LuaParser';
-import { NamelistContext } from './LuaParser';
-import { Explist1Context } from './LuaParser';
-import { ExpContext } from './LuaParser';
-import { UnopexpContext } from './LuaParser';
-import { OperandContext } from './LuaParser';
-import { VarContext } from './LuaParser';
-import { PrefixexpContext } from './LuaParser';
-import { FunctioncallContext } from './LuaParser';
-import { VarOrExpContext } from './LuaParser';
-import { NameAndArgsContext } from './LuaParser';
-import { VarSuffixContext } from './LuaParser';
-import { ArgsContext } from './LuaParser';
-import { FunctionContext } from './LuaParser';
-import { FuncbodyContext } from './LuaParser';
-import { Parlist1Context } from './LuaParser';
-import { TableconstructorContext } from './LuaParser';
-import { FieldlistContext } from './LuaParser';
-import { FieldContext } from './LuaParser';
-import { FieldsepContext } from './LuaParser';
-import { BinopContext } from './LuaParser';
-import { UnopContext } from './LuaParser';
-import { NumberContext } from './LuaParser';
-import { StringContext } from './LuaParser';
+import { ChunkContext } from "./LuaParser";
+import { BlockContext } from "./LuaParser";
+import { StatContext } from "./LuaParser";
+import { DoblockContext } from "./LuaParser";
+import { WhileContext } from "./LuaParser";
+import { IfContext } from "./LuaParser";
+import { ElseifContext } from "./LuaParser";
+import { ElseContext } from "./LuaParser";
+import { ForContext } from "./LuaParser";
+import { ForinContext } from "./LuaParser";
+import { FunctiondeclContext } from "./LuaParser";
+import { LocalfunctiondeclContext } from "./LuaParser";
+import { LocalvardeclContext } from "./LuaParser";
+import { AssignmentContext } from "./LuaParser";
+import { RepeatContext } from "./LuaParser";
+import { LaststatContext } from "./LuaParser";
+import { FuncnameContext } from "./LuaParser";
+import { Varlist1Context } from "./LuaParser";
+import { NamelistContext } from "./LuaParser";
+import { Explist1Context } from "./LuaParser";
+import { ExpContext } from "./LuaParser";
+import { UnopexpContext } from "./LuaParser";
+import { OperandContext } from "./LuaParser";
+import { VarContext } from "./LuaParser";
+import { PrefixexpContext } from "./LuaParser";
+import { FunctioncallContext } from "./LuaParser";
+import { VarOrExpContext } from "./LuaParser";
+import { NameAndArgsContext } from "./LuaParser";
+import { VarSuffixContext } from "./LuaParser";
+import { ArgsContext } from "./LuaParser";
+import { FunctionContext } from "./LuaParser";
+import { FuncbodyContext } from "./LuaParser";
+import { Parlist1Context } from "./LuaParser";
+import { TableconstructorContext } from "./LuaParser";
+import { FieldlistContext } from "./LuaParser";
+import { FieldContext } from "./LuaParser";
+import { FieldsepContext } from "./LuaParser";
+import { BinopContext } from "./LuaParser";
+import { UnopContext } from "./LuaParser";
+import { NumberContext } from "./LuaParser";
+import { StringContext } from "./LuaParser";
 
 
 /**

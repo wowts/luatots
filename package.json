@@ -1,32 +1,35 @@
 {
-  "name": "luatots",
-  "version": "1.1.0",
-  "description": "",
-  "main": "dist/index.js",
-  "scripts": {
-    "antlr": "antlr4ts -visitor Lua.g",
-    "prepare": "tsc -p .",
-    "debug": "tsc -p . && node dist/index.js",
-    "watch": "tsc -w",
-    "test": "ava dist/tests",
-    "test:watch": "ava --watch dist/tests",
-    "test:debug": "node node_modules/ava/profile.js dist/tests",
-    "ovale": "node dist/index.js \"D:/Applications/World of Warcraft/Interface/AddOns/Ovale\" ../ovale-ts"
-  },
-  "author": "Sidoine De Wispelaere",
-  "repository": {
-    "url": "https://github.com/Sidoine/luatots"
-  },
-  "license": "MIT",
-  "dependencies": {
-    "antlr4ts": "0.4.1-alpha.0",
-    "mkdirp": "^0.5.1"
-  },
-  "devDependencies": {
-    "@types/mkdirp": "^0.5.1",
-    "antlr4ts-cli": "0.4.0-alpha.4",
-    "typescript": "2.3.4",
-    "@types/node": "^8.0.0",
-    "ava": "^0.22.0"
-  }
+    "name": "luatots",
+    "version": "1.2.0",
+    "description": "",
+    "main": "dist/index.js",
+    "bin": {
+        "luatots": "./bin/luatots"
+    },
+    "scripts": {
+        "antlr": "antlr4ts -visitor Lua.g",
+        "prepare": "tsc -p .",
+        "debug": "tsc -p . && node dist/index.js",
+        "watch": "tsc -w",
+        "test": "ava",
+        "test:watch": "ava --watch",
+        "test:debug": "node node_modules/ava/profile.js dist/tests",
+        "ovale": "node dist/index.js \"D:/Applications/World of Warcraft/Interface/AddOns/Ovale\" ../ovale-ts"
+    },
+    "author": "Sidoine De Wispelaere",
+    "repository": {
+        "url": "https://github.com/Sidoine/luatots"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "antlr4ts": "^0.5.0-alpha.3",
+        "mkdirp": "^0.5.1"
+    },
+    "devDependencies": {
+        "@types/mkdirp": "^0.5.1",
+        "antlr4ts-cli": "^0.5.0-alpha.3",
+        "typescript": "^3",
+        "@types/node": "^8.0.0",
+        "ava": "^2.2.0"
+    }
 }
